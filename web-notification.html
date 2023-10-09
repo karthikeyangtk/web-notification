@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Web notification</title>
+    <link rel="icon" href="https://i.pinimg.com/originals/ad/ad/e5/adade578e1d686c11e21afafde839aec.png">
+  </head>
+  <body>
+    <script type="application/javascript">
+
+      /**
+       * Browser doesn't support alert
+       */
+      function showBrowserAlert() {
+        alert(`Browser doesn't support`)
+      }
+  
+      /**
+       * User denied alert
+       */
+      function userDeniedAlert() {
+        alert(`Browser doesn't support`)
+      }
+
+      /**
+       * Show notification
+       */
+      function showNotification() {
+        const body =  document.getElementById('notification')?.value || ''
+        const visibility = document.visibilityState
+        const title = "Web-notification";
+        const notification = new Notification(title, { body, 
+          // icon, We can add logo of our site
+          // vibrate, we can add vibrate in []
+        });
+        if (visibility === "visible") {
+          return notification.close()
+        }
+        notification.onclick = () => {
+          notification.close()
+        }
+      }
+
+      /**
+       * Request user permission
+       */
+      async function requestyserNotification() {
+        try {
+          const response = await Notification.requestPermission()
+          switch (response) {
+            case 'granted':
+            showNotification()
+              break;
+            case 'denied':
+              userDeniedAlert()
+              break;
+            case 'default':
+              requestyserNotification()
+              break;
+            default:
+              showBrowserAlert()
+              break;
+          }
+        } catch (error) {
+          showBrowserAlert()
+        }
+      }
+
+      /**
+       * Send notification
+       */
+      function sendNotification() {
+        const text =  document.getElementById('notification')?.value || ''
+        // If no text. then we should notify user to enter the notify text
+        if (!text) {
+          return alert('Content is required')
+        }
+
+        // Check browser support or not
+        if ('Notification' in window) {
+          const checkNotificationPermission = Notification.permission
+          switch (checkNotificationPermission) {
+            case 'default': // if default, we need to request permission to allow notification
+              requestyserNotification()
+              break;
+            case 'granted':
+              showNotification()
+              break;
+            case 'denied':
+              userDeniedAlert()
+              break;
+            default:
+              showBrowserAlert()
+              break;
+          }
+        } else {
+          showBrowserAlert()
+        }
+      }
+    </script>
+    <h1\>Enter text to receive notification</h1>
+    <div>
+      <input type="text" name="notification" id="notification" />
+      <button onclick="sendNotification()">Send</button>
+    </div>
+  </body>
+</html>
